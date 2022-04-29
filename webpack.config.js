@@ -5,6 +5,13 @@ module.exports = {
   mode: 'development', // see https://webpack.js.org/configuration/mode/
   entry: './src/app.ts',
   devtool: 'inline-source-map',
+  devServer: {
+    static: {
+      directory: path.join(__dirname, 'src'),
+    },
+    compress: true,
+    port: 9000,
+  },
   module: {
     rules: [
       {
