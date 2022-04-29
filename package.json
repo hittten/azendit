@@ -1,0 +1,25 @@
+{
+  "name": "javascript-task-manager",
+  "version": "1.0.0",
+  "description": "A simple typescript application for learn javascript and typescript.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hittten/javascript-task-manager.git"
+  },
+  "keywords": [
+    "javascript",
+    "typescript",
+    "task manager",
+    "learn"
+  ],
+  "author": "Gilberto López Ambrosino",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hittten/javascript-task-manager/issues"
+  },
+  "homepage": "https://github.com/hittten/javascript-task-manager#readme"
+}
