@@ -14,6 +14,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Icons"
         rel="stylesheet">
   <link href="styles.css" rel="stylesheet">
+
+  <script src="app.js" defer></script>
 </head>
 <body>
 <header>
@@ -23,97 +25,8 @@
   <label>
     <input id="taskInput" type="text" placeholder="¿Qué necesitas hacer?">
   </label>
-  <ul>
-    <li>
-      <div>
-        <input type="checkbox">
-        <span>Mi primera tarea</span>
-      </div>
-      <span class="material-icons btn-delete">delete_outline</span>
-      <textarea>Mi primera tarea</textarea>
-      <span class="material-icons btn-save">done</span>
-    </li>
-    <li>
-      <div>
-        <input type="checkbox">
-        <span>Una tarea sin terminar</span>
-      </div>
-      <span class="material-icons btn-delete">delete_outline</span>
-      <textarea>Una tarea sin terminar</textarea>
-      <span class="material-icons btn-save">done</span>
-    </li>
-    <li>
-      <div>
-        <input type="checkbox" checked>
-        <span>Una tarea terminada</span>
-      </div>
-      <span class="material-icons btn-delete">delete_outline</span>
-      <textarea>Una tarea terminada</textarea>
-      <span class="material-icons btn-save">done</span>
-    </li>
-    <li class="updating">
-      <div>
-        <input type="checkbox">
-        <span>Una tarea para editar</span>
-      </div>
-      <span class="material-icons btn-delete">delete_outline</span>
-      <textarea>Una tarea para editar</textarea>
-      <span class="material-icons btn-save">done</span>
-    </li>
-    <li>
-      <div>
-        <input type="checkbox" checked>
-        <span>Una tarea para eliminar</span>
-      </div>
-      <span class="material-icons btn-delete">delete_outline</span>
-      <textarea>Una tarea para eliminar</textarea>
-      <span class="material-icons btn-save">done</span>
-    </li>
-    <li>
-      <div>
-        <input type="checkbox">
-        <span>Una tarea con un texto muy largo: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. A aliquid asperiores consequuntur dolorem excepturi fugiat harum ipsa iure laboriosam libero minima neque porro possimus quam, quasi qui saepe velit veritatis."</span>
-      </div>
-      <span class="material-icons btn-delete">delete_outline</span>
-      <textarea>Una tarea con un texto muy largo: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. A aliquid asperiores consequuntur dolorem excepturi fugiat harum ipsa iure laboriosam libero minima neque porro possimus quam, quasi qui saepe velit veritatis."</textarea>
-      <span class="material-icons btn-save">done</span>
-    </li>
-    <li>
-      <div>
-        <input type="checkbox">
-        <span>Tarea numero 7</span>
-      </div>
-      <span class="material-icons btn-delete">delete_outline</span>
-      <textarea>Tarea numero 7</textarea>
-      <span class="material-icons btn-save">done</span>
-    </li>
-    <li>
-      <div>
-        <input type="checkbox">
-        <span>Tarea numero 8</span>
-      </div>
-      <span class="material-icons btn-delete">delete_outline</span>
-      <textarea>Tarea numero 8</textarea>
-      <span class="material-icons btn-save">done</span>
-    </li>
-    <li>
-      <div>
-        <input type="checkbox">
-        <span>Tarea numero 9</span>
-      </div>
-      <span class="material-icons btn-delete">delete_outline</span>
-      <textarea>Tarea numero 9</textarea>
-      <span class="material-icons btn-save">done</span>
-    </li>
-    <li>
-      <div>
-        <input type="checkbox">
-        <span>Tarea numero 10</span>
-      </div>
-      <span class="material-icons btn-delete">delete_outline</span>
-      <textarea>Tarea numero 10</textarea>
-      <span class="material-icons btn-save">done</span>
-    </li>
+  <ul id="taskList">
+    <!-- it fills with javascript -->
   </ul>
   <div class="info">
     <p>Quedan 8 tareas</p>
