@@ -1,5 +1,6 @@
 console.log('hello world');
 
+// Mock
 const TASKS = [
   {
     id: 1,
@@ -53,13 +54,40 @@ const TASKS = [
   },
 ];
 
+//The maximum is exclusive and the minimum is inclusive
+function getRandomId(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  const randomInt = Math.floor(Math.random() * (max - min) + min);
+  return randomInt + new Date().getTime().toString()
+}
+
 // Elements
 const taskListElement = document.querySelector('#taskList');
+const taskInputElement = document.querySelector('#taskInput');
 
-for (const task of TASKS) {
-  const taskElement = document.createElement('li');
+// Task Functions
+function getTasks() {
+  return TASKS;
+}
 
-  taskElement.innerHTML = `
+function createTask(description) {
+  const task = {
+    id: getRandomId(100, 999),
+    description,
+    done: false,
+  };
+
+  TASKS.push(task);
+
+  return task
+}
+
+// Task Element Functions
+function createTaskElement(task) {
+  const element = document.createElement('li')
+
+  element.innerHTML = `
     <div>
       <input type="checkbox" ${task.done ? 'checked' : ''}>
       <span>${task.description}</span>
@@ -69,5 +97,30 @@ for (const task of TASKS) {
     <span class="material-icons btn-save">done</span>
   `;
 
-  taskListElement.appendChild(taskElement)
+  return element
 }
+
+function createTaskElements(tasks) {
+  taskListElement.innerHTML = '';
+  for (const task of tasks) {
+    const taskElement = createTaskElement(task)
+    taskListElement.appendChild(taskElement)
+  }
+}
+
+// Events
+taskInputElement.onkeyup = (e) => {
+  const input = e.target;
+
+  if (e.key === 'Enter' && input.value) {
+    input.focus();
+    const task = createTask(input.value);
+    const taskElement = createTaskElement(task);
+    input.value = '';
+
+    taskListElement.appendChild(taskElement);
+  }
+};
+
+// App
+createTaskElements(getTasks());
