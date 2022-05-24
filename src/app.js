@@ -90,6 +90,11 @@ function createTask(description) {
   return task
 }
 
+function updateTask(task) {
+  const index = TASKS.findIndex(t => t.id === task.id);
+  TASKS[index] = task;
+}
+
 // Task Element Functions
 function createTaskElement(task) {
   const element = document.createElement('li')
@@ -104,7 +109,28 @@ function createTaskElement(task) {
     <span class="material-icons btn-save">done</span>
   `;
 
+  setEvents(element, task)
+
   return element
+}
+
+function setEvents(element, task) {
+  const checkboxDone = element.querySelector('input')
+
+  checkboxDone.onchange = () =>
+    taskEvent({...task, done: checkboxDone.checked}, element, 'Update')
+}
+
+function taskEvent(task, element, action) {
+  const TaskEvent = new CustomEvent('TaskEvent', {
+    bubbles: true,
+    detail: {
+      action,
+      task,
+    }
+  });
+
+  element.dispatchEvent(TaskEvent)
 }
 
 function createTaskElements(tasks) {
@@ -151,3 +177,12 @@ filterButtonsContainer.addEventListener('click', (e) => {
 
 // App
 createTaskElements(getTasks());
+
+taskListElement.addEventListener('TaskEvent', (e) => {
+  const {action, task} = e.detail
+
+  if (action === 'Update') {
+    updateTask(task)
+    return
+  }
+});
