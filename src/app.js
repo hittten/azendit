@@ -67,7 +67,14 @@ const taskListElement = document.querySelector('#taskList');
 const taskInputElement = document.querySelector('#taskInput');
 
 // Task Functions
-function getTasks() {
+function getTasks(filter = 'all') {
+  if (filter === 'completed') {
+    return TASKS.filter(task => task.done);
+  }
+  if (filter === 'pending') {
+    return TASKS.filter(task => !task.done);
+  }
+
   return TASKS;
 }
 
@@ -121,6 +128,26 @@ taskInputElement.onkeyup = (e) => {
     taskListElement.appendChild(taskElement);
   }
 };
+
+// Filter control
+const filterButtonsContainer = document.querySelector('.filterButtons');
+const filterButtons = filterButtonsContainer.querySelectorAll('button');
+
+filterButtonsContainer.addEventListener('click', (e) => {
+  const button = e.target;
+  if (!(button instanceof HTMLButtonElement)) {
+    return
+  }
+
+  const filter = button.dataset.filter
+  createTaskElements(getTasks(filter))
+
+  // disable buttons
+  for (const btn of filterButtons) {
+    btn.disabled = false;
+  }
+  button.disabled = true;
+})
 
 // App
 createTaskElements(getTasks());
