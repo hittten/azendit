@@ -29,3 +29,8 @@ export function updateTask(task: Task) {
   const index = TASKS.findIndex(t => t.id === task.id);
   TASKS[index] = task;
 }
+
+export const deleteTask = (task: Task): void => {
+  const index = TASKS.findIndex(t => t.id === task.id);
+  TASKS.splice(index, 1);
+}

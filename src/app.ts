@@ -1,5 +1,5 @@
 import { createTaskElement, createTaskElements, editTaskElement, formEditTask, TaskEvent, taskListElement } from "./task-element.service";
-import { createTask, getTasks, updateTask } from "./task.service";
+import { createTask, deleteTask, getTasks, updateTask } from "./task.service";
 
 // Elements
 const taskInputElement = document.querySelector<HTMLInputElement>('#taskInput');
@@ -48,7 +48,12 @@ taskListElement.addEventListener('TaskEvent', (e: TaskEvent) => {
   if (action === 'Update') {
     updateTask(task)
     editTaskElement(element, task)
-    formEditTask(element, false)
-    return
   }
+
+  if (action === 'Delete') {
+    deleteTask(task)
+    element.remove()
+  }
+
+  formEditTask(element, false)
 });

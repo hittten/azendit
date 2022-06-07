@@ -1,3 +1,4 @@
+import { openDialog } from "./dialog.service";
 import { Task } from "./task";
 
 export const taskListElement = document.querySelector('#taskList');
@@ -38,6 +39,7 @@ function setEvents(element: HTMLLIElement, task: Task) {
   const checkboxDone: HTMLInputElement = element.querySelector('input')
   const updateInput: HTMLTextAreaElement = element.querySelector('textarea')
   const buttonSave: HTMLSpanElement = element.querySelector('.btn-save')
+  const buttonDelete: HTMLSpanElement = element.querySelector('.btn-delete')
 
   checkboxDone.onchange = () =>
     taskEvent({ ...task, done: checkboxDone.checked }, element, 'Update')
@@ -59,6 +61,14 @@ function setEvents(element: HTMLLIElement, task: Task) {
       taskEvent({ ...task, description: updateInput.value }, element, 'Update')
       return
     }
+  }
+
+  buttonDelete.onclick = () => {
+    openDialog(task.description).then(value => {
+      if (value) {
+        taskEvent(task, element, 'Delete');
+      }
+    })
   }
 }
 
