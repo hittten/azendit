@@ -1,61 +1,63 @@
+import { Task } from "./task";
+
 console.log('hello world');
 
 // Mock
-const TASKS = [
+const TASKS: Task[] = [
   {
-    id: 1,
+    id: '1',
     description: 'Mi primera tarea',
     done: false,
   },
   {
-    id: 2,
+    id: '2',
     description: 'Una tarea sin terminar',
     done: false,
   },
   {
-    id: 3,
+    id: '3',
     description: 'Una tarea terminada',
     done: true,
   },
   {
-    id: 4,
+    id: '4',
     description: 'Una tarea para editar',
     done: false,
   },
   {
-    id: 5,
+    id: '5',
     description: 'Una tarea para eliminar',
     done: true,
   },
   {
-    id: 6,
+    id: '6',
     description: 'Una tarea con un texto muy largo: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. A aliquid asperiores consequuntur dolorem excepturi fugiat harum ipsa iure laboriosam libero minima neque porro possimus quam, quasi qui saepe velit veritatis."',
     done: false,
   },
   {
-    id: 7,
+    id: '7',
     description: 'Tarea numero 7',
     done: false,
   },
   {
-    id: 8,
+    id: '8',
     description: 'Tarea numero 8',
     done: false,
   },
   {
-    id: 9,
+    id: '9',
     description: 'Tarea numero 9',
     done: false,
   },
   {
-    id: 10,
+    id: '10',
     description: 'Tarea numero 10',
     done: false,
   },
 ];
 
 //The maximum is exclusive and the minimum is inclusive
-function getRandomId(min, max) {
+function getRandomId(min: number, max: number) {
   min = Math.ceil(min);
   max = Math.floor(max);
   const randomInt = Math.floor(Math.random() * (max - min) + min);
@@ -64,7 +66,7 @@ function getRandomId(min, max) {
 
 // Elements
 const taskListElement = document.querySelector('#taskList');
-const taskInputElement = document.querySelector('#taskInput');
+const taskInputElement = document.querySelector<HTMLInputElement>('#taskInput');
 
 // Task Functions
 function getTasks(filter = 'all') {
@@ -78,7 +80,7 @@ function getTasks(filter = 'all') {
   return TASKS;
 }
 
-function createTask(description) {
+function createTask(description: string) {
   const task = {
     id: getRandomId(100, 999),
     description,
@@ -90,13 +92,13 @@ function createTask(description) {
   return task
 }
 
-function updateTask(task) {
+function updateTask(task: Task) {
   const index = TASKS.findIndex(t => t.id === task.id);
   TASKS[index] = task;
 }
 
 // Task Element Functions
-function createTaskElement(task) {
+function createTaskElement(task: Task) {
   const element = document.createElement('li')
 
   element.innerHTML = `
@@ -114,14 +116,16 @@ function createTaskElement(task) {
   return element
 }
 
-function setEvents(element, task) {
+function setEvents(element: HTMLLIElement, task: Task) {
   const checkboxDone = element.querySelector('input')
 
   checkboxDone.onchange = () =>
-    taskEvent({...task, done: checkboxDone.checked}, element, 'Update')
+    taskEvent({ ...task, done: checkboxDone.checked }, element, 'Update')
 }
 
-function taskEvent(task, element, action) {
+type TaskEvent = CustomEvent<{ action: string, task: Task }>
+
+function taskEvent(task: Task, element: HTMLLIElement, action: string) {
   const TaskEvent = new CustomEvent('TaskEvent', {
     bubbles: true,
     detail: {
@@ -133,7 +137,7 @@ function taskEvent(task, element, action) {
   element.dispatchEvent(TaskEvent)
 }
 
-function createTaskElements(tasks) {
+function createTaskElements(tasks: Task[]) {
   taskListElement.innerHTML = '';
   for (const task of tasks) {
     const taskElement = createTaskElement(task)
@@ -143,7 +147,7 @@ function createTaskElements(tasks) {
 
 // Events
 taskInputElement.onkeyup = (e) => {
-  const input = e.target;
+  const input = e.target as HTMLInputElement;
 
   if (e.key === 'Enter' && input.value) {
     input.focus();
@@ -178,8 +182,8 @@ filterButtonsContainer.addEventListener('click', (e) => {
 // App
 createTaskElements(getTasks());
 
-taskListElement.addEventListener('TaskEvent', (e) => {
-  const {action, task} = e.detail
+taskListElement.addEventListener('TaskEvent', (e: TaskEvent) => {
+  const { action, task } = e.detail
 
   if (action === 'Update') {
     updateTask(task)
