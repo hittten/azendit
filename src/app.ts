@@ -1,4 +1,4 @@
-import { createTaskElement, createTaskElements, TaskEvent, taskListElement } from "./task-element.service";
+import { createTaskElement, createTaskElements, editTaskElement, formEditTask, TaskEvent, taskListElement } from "./task-element.service";
 import { createTask, getTasks, updateTask } from "./task.service";
 
 // Elements
@@ -42,10 +42,13 @@ filterButtonsContainer.addEventListener('click', (e) => {
 createTaskElements(getTasks());
 
 taskListElement.addEventListener('TaskEvent', (e: TaskEvent) => {
+  const element = e.target as HTMLLIElement
   const { action, task } = e.detail
 
   if (action === 'Update') {
     updateTask(task)
+    editTaskElement(element, task)
+    formEditTask(element, false)
     return
   }
 });
