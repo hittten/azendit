@@ -1,4 +1,6 @@
-const express = require('express')
+import express from 'express';
+import { createConnection } from './db';
+import { Task, TaskRow } from './types';
 const app = express()
 const port = 3000
 
@@ -9,30 +11,20 @@ const port = 3000
   - Find somthing in the database
   - Return a json with some data
 */
-app.get('/tasks', (req, res) => {
-
-  const mysql = require('mysql');
-  const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '1234',
-    database: 'aszendit'
-  });
-
+app.get('/tasks', (_, res) => {
+  const connection = createConnection()
   connection.connect();
 
-  connection.query('SELECT * FROM tasks', function (err, rows, fields) {
+  connection.query('SELECT * FROM tasks', function (err, rows: TaskRow[]) {
     if (err) {
       console.error(err)
+
 
       res.sendStatus(500)
       return
     };
 
-    const json = rows.map(r => {
-      r.done = r.done === 1
-      return r
-    })
+    const json: Task[] = rows.map(r => ({ ...r, id: r.id.toString(), done: r.done === 1 }))
 
     res.send(json)
   });
