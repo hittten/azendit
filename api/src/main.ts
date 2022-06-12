@@ -11,11 +11,22 @@ const port = 3000
   - Find somthing in the database
   - Return a json with some data
 */
-app.get('/tasks', (_, res) => {
+app.get('/tasks', (req, res) => {
+  const filter = req.query.filter
+
+  let query = "";
+  if (filter === 'completed') {
+    query = "WHERE done = 1"
+  }
+
+  if (filter === 'pending') {
+    query = "WHERE done = 0"
+  }
+
   const connection = createConnection()
   connection.connect();
 
-  connection.query('SELECT * FROM tasks', function (err, rows: TaskRow[]) {
+  connection.query(`SELECT * FROM tasks ${query}`, function (err, rows: TaskRow[]) {
     if (err) {
       console.error(err)
 
