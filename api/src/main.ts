@@ -16,7 +16,7 @@ const port = 3000
   - Return a json with some data
 */
 app.get('/tasks', (req, res) => {
-  const filter = req.query.filter
+  const {filter, search} = req.query as Record<string, any>
 
   let query = "";
   if (filter === 'completed') {
@@ -25,6 +25,10 @@ app.get('/tasks', (req, res) => {
 
   if (filter === 'pending') {
     query = "WHERE done = 0"
+  }
+
+  if (search) {
+    query = `WHERE description LIKE '%${search.replaceAll(" ", "%")}%'`
   }
 
   dbQuery<TaskRow[]>(`SELECT *
