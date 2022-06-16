@@ -1,6 +1,7 @@
 import express from 'express';
 import {createConnection} from './db';
 import {Task, TaskRow} from './types';
+import {getTaskError} from "./validations";
 
 const app = express()
 app.use(express.json())
@@ -47,26 +48,18 @@ app.get('/tasks', (req, res) => {
 })
 
 app.post('/tasks', (req, res) => {
-  const description = req.body.description;
+  const taskEntry = req.body;
+  const message = getTaskError(taskEntry);
+  if (message) {
+    res.status(400).send({message})
+    return
+  }
 
-  if (!description) {
-    res.status(400).send({
-      message: 'description is required!'
-    })
-    return;
-  }
-  if (description.length > 100) {
-    res.status(400).send({
-      message: `description is to big! current: ${description.length
-      }, max: 100`
-    })
-    return;
-  }
   const connection = createConnection()
   connection.connect()
 
   connection.query(`INSERT INTO tasks (description, done)
-                    VALUES ('${description}', '0')`,
+                    VALUES ('${taskEntry.description}', '0')`,
     (err, rows) => {
       if (err) {
         console.error(err)
@@ -76,8 +69,50 @@ app.post('/tasks', (req, res) => {
 
       res.send({
         id: rows.insertId.toString(),
-        description,
+        description: taskEntry.description,
         done: false
+      })
+    });
+
+  connection.end();
+})
+
+app.put('/tasks/:id', (req, res) => {
+  const taskEntry = req.body;
+  const message = getTaskError(taskEntry);
+  if (message) {
+    res.status(400).send({message})
+    return
+  }
+
+  const id = req.params.id
+  taskEntry.done = taskEntry.done ? 1 : 0
+  const fields = Object.entries(taskEntry)
+    .map(e => `${e[0]} = '${e[1]}'`)
+    .join(', ')
+
+  const connection = createConnection()
+  connection.connect()
+
+  connection.query(`UPDATE tasks
+                    SET ${fields}
+                    WHERE id = '${id}'`,
+    (err, rows) => {
+      if (err) {
+        console.error(err)
+        res.sendStatus(500)
+        return
+      }
+
+      if (!rows.affectedRows) {
+        res.sendStatus(404)
+        return
+      }
+
+      res.send({
+        id: id,
+        description: taskEntry.description,
+        done: !!taskEntry.done,
       })
     });
 

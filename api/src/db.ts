@@ -6,4 +6,3 @@ export const createConnection = () => mysql.createConnection({
   password: '1234',
   database: 'aszendit'
 });
-
