@@ -1,7 +1,8 @@
 import express from 'express';
-import {createConnection} from './db';
+import {dbQuery} from './db';
 import {Task, TaskRow} from './types';
 import {getTaskError} from "./validations";
+import {OkPacket} from "mysql";
 
 const app = express()
 app.use(express.json())
@@ -26,25 +27,19 @@ app.get('/tasks', (req, res) => {
     query = "WHERE done = 0"
   }
 
-  const connection = createConnection()
-  connection.connect();
-
-  connection.query(`SELECT *
-                    FROM tasks ${query}`,
-    (err, rows: TaskRow[]) => {
-      if (err) {
-        console.error(err)
-
-        res.sendStatus(500)
-        return
-      }
-
-      const json: Task[] = rows.map(r => ({...r, id: r.id.toString(), done: r.done === 1}))
+  dbQuery<TaskRow[]>(`SELECT *
+                      FROM tasks ${query}`)
+    .then((rows) => {
+      const json: Task[] = rows
+        .map(r => ({
+          ...r,
+          id: r.id.toString(),
+          done: !!r.done
+        }))
 
       res.send(json)
-    });
-
-  connection.end();
+    })
+    .catch(() => res.sendStatus(500))
 })
 
 app.post('/tasks', (req, res) => {
@@ -55,26 +50,16 @@ app.post('/tasks', (req, res) => {
     return
   }
 
-  const connection = createConnection()
-  connection.connect()
-
-  connection.query(`INSERT INTO tasks (description, done)
-                    VALUES ('${taskEntry.description}', '0')`,
-    (err, rows) => {
-      if (err) {
-        console.error(err)
-        res.sendStatus(500)
-        return
-      }
-
+  dbQuery<OkPacket>(`INSERT INTO tasks (description, done)
+                     VALUES ('${taskEntry.description}', '0')`)
+    .then((rows) => {
       res.send({
         id: rows.insertId.toString(),
         description: taskEntry.description,
         done: false
       })
-    });
-
-  connection.end();
+    })
+    .catch(() => res.sendStatus(500))
 })
 
 app.put('/tasks/:id', (req, res) => {
@@ -91,19 +76,10 @@ app.put('/tasks/:id', (req, res) => {
     .map(e => `${e[0]} = '${e[1]}'`)
     .join(', ')
 
-  const connection = createConnection()
-  connection.connect()
-
-  connection.query(`UPDATE tasks
-                    SET ${fields}
-                    WHERE id = '${id}'`,
-    (err, rows) => {
-      if (err) {
-        console.error(err)
-        res.sendStatus(500)
-        return
-      }
-
+  dbQuery<OkPacket>(`UPDATE tasks
+                     SET ${fields}
+                     WHERE id = '${id}'`)
+    .then((rows) => {
       if (!rows.affectedRows) {
         res.sendStatus(404)
         return
@@ -114,9 +90,40 @@ app.put('/tasks/:id', (req, res) => {
         description: taskEntry.description,
         done: !!taskEntry.done,
       })
-    });
+    })
+    .catch(() => res.sendStatus(500))
+})
 
-  connection.end();
+app.delete('/tasks/:id', async (req, res) => {
+  try {
+    const id = req.params.id
+    const tasks = await dbQuery<TaskRow[]>(`SELECT *
+                                            FROM tasks
+                                            WHERE id = '${id}'`)
+
+    if (!tasks.length) {
+      res.sendStatus(404)
+      return
+    }
+
+    const result = await dbQuery<OkPacket>(`DELETE
+                                            FROM tasks
+                                            WHERE id = '${id}'`)
+
+    if (!result.affectedRows) {
+      res.sendStatus(500)
+      return
+    }
+
+    res.send({
+      id,
+      description: tasks[0].description,
+      done: !!tasks[0].done,
+    })
+
+  } catch (e) {
+    res.sendStatus(500)
+  }
 })
 
 app.listen(port, () => {
