@@ -8,6 +8,11 @@ export async function getTasks(filter = 'all') {
   return response.json()
 }
 
+export async function searchTasks(text: string) {
+  const response = await fetch(`${apiUrl}/tasks?search=${text}`)
+  return response.json()
+}
+
 export async function createTask(description: string) {
   const response = await fetch(`${apiUrl}/tasks`, {
     method: 'POST',

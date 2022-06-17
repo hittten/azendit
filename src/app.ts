@@ -6,10 +6,12 @@ import {
   TaskEvent,
   taskListElement
 } from "./task-element.service";
-import {createTask, deleteTask, getTasks, updateTask} from "./task.service";
+import {createTask, deleteTask, getTasks, searchTasks, updateTask} from "./task.service";
+import {tryObservables} from "./observables";
 
 // Elements
 const taskInputElement = document.querySelector<HTMLInputElement>('#taskInput');
+const searchInputElement = document.querySelector<HTMLInputElement>('#search');
 
 // Events
 taskInputElement.onkeyup = async (e) => {
@@ -70,3 +72,29 @@ taskListElement.addEventListener('TaskEvent', async (e: TaskEvent) => {
 
   formEditTask(element, false)
 });
+
+window.onkeydown = (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+    e.preventDefault();
+    searchInputElement.classList.add('open')
+    searchInputElement.focus()
+
+    function onKeyupEscape(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        searchInputElement.classList.remove('open')
+        getTasks()
+          .then(tasks => createTaskElements(tasks))
+        window.removeEventListener("keydown", onKeyupEscape)
+      }
+    }
+
+    window.addEventListener("keydown", onKeyupEscape)
+  }
+}
+
+searchInputElement.onkeyup = async () => {
+  const tasks = await searchTasks(searchInputElement.value)
+  createTaskElements(tasks)
+}
+
+tryObservables()
