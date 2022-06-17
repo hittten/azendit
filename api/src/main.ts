@@ -3,10 +3,13 @@ import {dbQuery} from './db';
 import {Task, TaskRow} from './types';
 import {getTaskError} from "./validations";
 import {OkPacket} from "mysql";
+import cors from "cors";
 
 const app = express()
-app.use(express.json())
 const port = 3000
+
+app.use(cors())
+app.use(express.json())
 
 /* How to make an endpoint ?
   - Define a path
