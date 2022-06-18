@@ -8,6 +8,7 @@ import {
 } from "./task-element.service";
 import {createTask, deleteTask, getTasks, searchTasks, updateTask} from "./task.service";
 import {tryObservables} from "./observables";
+import {BehaviorSubject, debounceTime, distinctUntilChanged, Subject, switchMap, take, tap} from "rxjs";
 
 // Elements
 const taskInputElement = document.querySelector<HTMLInputElement>('#taskInput');
@@ -33,7 +34,7 @@ taskInputElement.onkeyup = async (e) => {
 const filterButtonsContainer = document.querySelector('.filterButtons');
 const filterButtons = filterButtonsContainer.querySelectorAll('button');
 
-filterButtonsContainer.addEventListener('click', async (e) => {
+filterButtonsContainer.addEventListener('click', (e) => {
   const button = e.target;
   if (!(button instanceof HTMLButtonElement)) {
     return
@@ -47,13 +48,16 @@ filterButtonsContainer.addEventListener('click', async (e) => {
   taskListElement.innerHTML = 'loading...'
 
   const filter = button.dataset.filter
-  const tasks = await getTasks(filter)
-  createTaskElements(tasks)
+  tasks.next(filter)
 })
 
 // App
-getTasks()
-  .then(tasks => createTaskElements(tasks))
+const tasks = new BehaviorSubject('all')
+tasks
+  .pipe(
+    switchMap(filter => getTasks(filter)),
+  )
+  .subscribe(createTaskElements)
 
 taskListElement.addEventListener('TaskEvent', async (e: TaskEvent) => {
   const element = e.target as HTMLLIElement
@@ -82,8 +86,7 @@ window.onkeydown = (e) => {
     function onKeyupEscape(e: KeyboardEvent) {
       if (e.key === 'Escape') {
         searchInputElement.classList.remove('open')
-        getTasks()
-          .then(tasks => createTaskElements(tasks))
+        tasks.next('all')
         window.removeEventListener("keydown", onKeyupEscape)
       }
     }
@@ -92,9 +95,22 @@ window.onkeydown = (e) => {
   }
 }
 
-searchInputElement.onkeyup = async () => {
-  const tasks = await searchTasks(searchInputElement.value)
-  createTaskElements(tasks)
+const searchTerms = new Subject<string>();
+searchTerms
+  .pipe(
+    // wait 300ms after each keystroke before considering the term
+    debounceTime(300),
+
+    // ignore new term if same as previous term
+    distinctUntilChanged(),
+
+    // switch to new search observable each time the term changes
+    switchMap((term: string) => searchTasks(term)),
+  )
+  .subscribe(tasks => createTaskElements(tasks))
+
+searchInputElement.onkeyup = () => {
+  searchTerms.next(searchInputElement.value)
 }
 
-tryObservables()
+// tryObservables()
